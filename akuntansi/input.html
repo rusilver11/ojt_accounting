@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <title>Input Formatter</title>
+ <script src="js/jquery.js"></script>
+ <style>
+* { margin: 0; padding: 0; }
+body {
+ font-family: Arial, sans-serif;
+ font-size: 14px;
+}
+.container { margin: 50px auto; width: 80%; }
+input[type="text"] {
+ font-family: Arial, sans-serif;
+ font-size: 14px;
+ padding: 5px 1px;
+}
+table td { margin: 10px 0px; }
+input[readonly] { cursor: not-allowed; }
+ </style>
+ <script>
+ 
+// memformat angka ribuan
+function formatAngka(angka) {
+ if (typeof(angka) != 'string') angka = angka.toString();
+ var reg = new RegExp('([0-9]+)([0-9]{3})');
+ while(reg.test(angka)) angka = angka.replace(reg, '$1.$2');
+ return angka;
+}
+  
+// nilai total ditulis langsung, bisa dari hasil perhitungan lain
+var total = 4500,
+ bayar = 0,
+ kembali = 0;
+ 
+// masukkan angka total dari variabel
+$('#input-total').val(formatAngka(total));
+ 
+// tambah event keypress untuk input bayar
+$('#input-bayar').on('keypress', function(e) {
+ var c = e.keyCode || e.charCode;
+ switch (c) {
+  case 8: case 9: case 27: case 13: return;
+  case 65:
+   if (e.ctrlKey === true) return;
+ }
+ if (c < 48 || c > 57) e.preventDefault();
+}).on('keyup', function() {
+ var inp = $(this).val().replace(/\./g, '');
+  
+ // set nilai ke variabel bayar
+ bayar = new Number(inp);
+ $(this).val(formatAngka(inp));
+  
+ // set kembalian, validasi
+ if (bayar > total) kembali = bayar - total;
+ if (total > bayar) kembali = 0;
+ $('#input-kembali').val(formatAngka(kembali));
+});
+</script>
+</head>
+<body>
+ <div class="container">
+  <form action="post" novalidate>
+   <table>
+    <tr>
+     <td style="width: 150px;"><h4>TOTAL</h4></td>
+     <td>Rp. <input type="text" name="input_total" id="input-total" value="" readonly></td>
+    </tr>
+    <tr>
+     <td><h4>BAYAR</h4></td>
+     <td>Rp. <input type="text" name="input_bayar" id="input-bayar" value=""></td>
+    </tr>
+    <tr>
+     <td><h4>KEMBALI</h4></td>
+     <td>Rp. <input type="text" name="input_kembali" id="input-kembali" value="" readonly></td>
+    </tr>
+   </table>
+  </form>
+ </div>
+ <script src="jquery-1.9.0.min.js"></script>
+</body>
+</html>
